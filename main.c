@@ -21,10 +21,10 @@ typedef struct {
 }Assets;
 
 const int screenWidth = 800, screenHeight = 450;
-float frames_counter, frames_countdown, walking, frame_spawn;
-int countdown, timer, frameline, limit;
-bool spawn_set, dead, down, window_open = false;
-float downx, downy;
+float frames_counter = 0, frames_countdown = 0, walking = 0, frame_spawn = 0;
+int countdown = 3, timer = 121, frameline = 0, limit = 0;
+bool spawn_set = false, dead = false, down = false, window_open = false;
+float downx = 1, downy = 1;
 
 Camera2D camera = {0};
 Personagem personagem;
@@ -35,20 +35,12 @@ Assets background;
 
 void initGame(){
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-    if(window_open == false){
-        InitWindow(screenWidth, screenHeight, "Runner");
-        window_open = true;
-    }
+    InitWindow(screenWidth, screenHeight, "Runner");
     //ToggleFullscreen();
     InitPhysics();
     SetPhysicsGravity(0.0f, 1.1f);
     SetTargetFPS(60);
     
-    frames_counter= 0, frames_countdown = 0, walking = 0, frame_spawn = 0;
-    countdown = 3, timer = 121, frameline = 0, limit = 0;
-    spawn_set = false, dead = false, down = false;
-    downx = 1, downy = 1;
-
     ground.image = LoadTexture("./textura/ground/ground.png");
     ground.body = CreatePhysicsBodyRectangle((Vector2){screenWidth / 2, screenHeight}, 200000, 100, 10);
     ground.body->enabled = false;
@@ -61,7 +53,7 @@ void initGame(){
     personagem.height = personagem.texture.height/14;
     personagem.frame = 0;
 
-    for(int i = 0; i < 3; i++){        
+    for(int i = 0; i < 3; i++){
         rock[i].texture = LoadTexture("./textura/decor/rock.png");
         rock[i].width = rock[i].texture.width * 2.5;
         rock[i].height = rock[i].texture.height * 2.5;
@@ -80,6 +72,25 @@ void initGame(){
     camera.offset = (Vector2){screenWidth/2, screenHeight/2};
     camera.rotation = 0.0f;
     camera.zoom = 1.2f;
+}
+
+void reset (){
+    frames_counter= 0, frames_countdown = 0, walking = 0, frame_spawn = 0;
+    countdown = 3, timer = 121, frameline = 0, limit = 0;
+    spawn_set = false, dead = false, down = false;
+    downx = 1, downy = 1;
+
+    personagem.body->enabled = true;
+    personagem.body->orient = 0;
+    personagem.body->position.x = 400;
+    personagem.body->position.y = 390;    
+
+    for(int i = 0; i < 3; i++){
+        rock[i].position.x = -100;
+        rock[i].position.y = -100;
+        bird[i].position.x = -100;
+        bird[i].position.y = -100;
+    }
 }
 
 void contador(){
@@ -282,12 +293,12 @@ void desenho(){
         if(dead){
             DrawText("YOU LOSE", screenWidth/2 - 250, screenHeight/2 - 50, 100, RAYWHITE);
             DrawText("Press ENTER to restart", screenWidth/2 - 120, screenHeight - 100, 20, RAYWHITE);
-            if(IsKeyPressed(KEY_ENTER)) initGame();
+            if(IsKeyPressed(KEY_ENTER)) reset();
         }    
         else if(timer < 0){
             DrawText("YOU WIN", screenWidth/2 - 225, screenHeight/2 - 50, 100, RAYWHITE);
             DrawText("Press ENTER to restart", screenWidth/2 - 120, screenHeight - 100, 20, RAYWHITE);
-            if(IsKeyPressed(KEY_ENTER)) initGame();
+            if(IsKeyPressed(KEY_ENTER)) reset();
         }
     EndDrawing();
 }
